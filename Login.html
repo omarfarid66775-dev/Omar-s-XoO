@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sign in - Ultimate XO</title>
+<style>
+:root{--pink:#ff0055;--cyan:#00f3ff;--violet:#9d00ff}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background-color:#020205;color:#fff;font-family:'Segoe UI',sans-serif;overflow:hidden}
+/* calm space, same as the difficulty screen */
+.sky{position:fixed;inset:0;background-color:#020205;background-image:radial-gradient(circle at center,#0d001a 0%,#020205 100%)}
+.stars{position:fixed;inset:-50%;opacity:.55;background-image:radial-gradient(1.5px 1.5px at 20% 30%,#fff 100%,transparent),radial-gradient(1px 1px at 70% 10%,#9d00ff 100%,transparent),radial-gradient(2px 2px at 50% 80%,#fff 100%,transparent),radial-gradient(1px 1px at 90% 40%,#00f3ff 100%,transparent);background-size:300px 300px;animation:drift 90s linear infinite}
+@keyframes drift{to{transform:rotate(360deg)}}
+.stage{position:fixed;inset:0;display:flex;padding:125px 16px 24px;overflow-x:hidden;overflow-y:auto}
+.hang{--w:min(350px,calc(100vw - 32px));position:relative;margin:auto;width:min(350px,100%);transform-origin:50% -96px;animation:sway 8s ease-in-out infinite}
+.hang:focus-within{animation-play-state:paused}
+.hang.intro .card{pointer-events:none}
+@keyframes sway{0%,100%{transform:rotate(-.9deg)}50%{transform:rotate(.9deg)}}
+.rig{position:absolute;left:0;bottom:100%;width:100%;overflow:visible;z-index:2;filter:drop-shadow(0 3px 6px rgba(0,0,0,.5)) drop-shadow(0 0 8px rgba(157,0,255,.28))}
+.cords{position:absolute;left:0;bottom:100%;width:100%;overflow:visible;filter:drop-shadow(0 3px 6px rgba(0,0,0,.5)) drop-shadow(0 0 8px rgba(157,0,255,.28))}
+/* intro: the card swings in from behind the bar like a child on a swing, each arc smaller than the last */
+.swing{position:relative;z-index:1;transform-origin:50% calc(var(--w) * -.2457);animation:swingIn 3.6s ease-in-out .15s backwards}
+@keyframes swingIn{
+0%{opacity:0;transform:perspective(1400px) rotateX(-80deg)}
+8%{opacity:1}
+19%{transform:perspective(1400px) rotateX(48deg)}
+38%{transform:perspective(1400px) rotateX(-30deg)}
+56%{transform:perspective(1400px) rotateX(19deg)}
+71%{transform:perspective(1400px) rotateX(-10deg)}
+84%{transform:perspective(1400px) rotateX(5deg)}
+93%{transform:perspective(1400px) rotateX(-2deg)}
+100%{opacity:1;transform:perspective(1400px) rotateX(0deg)}}
+.card{padding:26px 22px 22px;text-align:center;border:2px solid rgba(157,0,255,.7);border-radius:26px;background-color:rgba(10,6,24,.88);box-shadow:0 0 34px rgba(157,0,255,.2)}
+h1{margin:0 0 6px;font:900 2.4rem/1 'Arial Black',sans-serif;letter-spacing:4px}
+h1 .x{color:#fff;text-shadow:0 0 12px rgba(255,255,255,.55)}
+h1 .o{color:var(--violet);text-shadow:0 0 14px rgba(157,0,255,.8)}
+.say{position:relative;min-height:64px;margin:4px 0 20px;padding:2px 6px 16px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:1rem;font-weight:800;line-height:1.35;letter-spacing:.2px;color:#fff;text-shadow:0 0 14px rgba(157,0,255,.55)}
+.say::after{content:"";position:absolute;left:18%;right:18%;bottom:0;height:2px;border-radius:2px;background-image:linear-gradient(90deg,transparent,var(--violet),transparent)}
+.tabs{display:flex;border:1px solid rgba(255,255,255,.15);border-radius:50px;padding:3px;margin-bottom:16px;background-color:rgba(255,255,255,.03)}
+.tabs button{flex:1;padding:10px;border:0;border-radius:50px;background-color:transparent;color:#fff;font-weight:700;font-size:14px;cursor:pointer;opacity:.55;transition:.25s}
+.tabs button.on{background-color:var(--violet);opacity:1;box-shadow:0 0 14px rgba(157,0,255,.5)}
+input{width:100%;padding:13px 20px;margin-bottom:10px;border-radius:50px;border:2px solid rgba(255,255,255,.14);background-color:rgba(255,255,255,.04);color:#fff;font-size:16px;outline:none;transition:.25s}
+input:focus{border-color:var(--cyan);box-shadow:0 0 14px rgba(0,243,255,.25)}
+input::placeholder{color:rgba(255,255,255,.38)}
+.err{min-height:18px;margin:0 0 6px;font-size:13px;color:#ff6688}
+.btn{display:block;width:100%;padding:13px;border-radius:50px;border:2px solid;background-color:transparent;color:#fff;font:700 16px 'Segoe UI',sans-serif;cursor:pointer;transition:.3s}
+.go{border-color:var(--pink);box-shadow:0 0 14px rgba(255,0,85,.28)}
+.go:hover:not(:disabled),.go:focus-visible{background-color:var(--pink);box-shadow:0 0 30px var(--pink);outline:none}
+.go:disabled{opacity:.5;cursor:wait}
+.guest{border-color:var(--cyan);color:var(--cyan);box-shadow:0 0 14px rgba(0,243,255,.2)}
+.guest:hover,.guest:focus-visible{background-color:var(--cyan);color:#000;box-shadow:0 0 30px var(--cyan);outline:none}
+.or{display:flex;align-items:center;gap:10px;margin:14px 0;font-size:12px;opacity:.4}
+.or::before,.or::after{content:"";flex:1;height:1px;background-color:#fff;opacity:.5}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="sky"></div>
+<div class="stars"></div>
+<div class="stage">
+  <div class="hang intro">
+    <!-- a hand from the side holds the card by its strings -->
+    <svg class="rig" viewBox="0 0 350 110" aria-hidden="true">
+      <defs>
+        <linearGradient id="hd" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3b2e7c"/><stop offset="1" stop-color="#191330"/></linearGradient>
+        <linearGradient id="bar" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6a52c0"/><stop offset="1" stop-color="#2a1a52"/></linearGradient>
+        <linearGradient id="slv" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2c2266"/><stop offset="1" stop-color="#110c26"/></linearGradient>
+      </defs>
+      <!-- control bar -->
+      <rect x="56" y="6" width="264" height="18" rx="9" fill="url(#bar)" stroke="#8a6be0" stroke-width="1.2"/>
+      <path d="M68 11H304" stroke="rgba(255,255,255,.35)" stroke-width="1.5" stroke-linecap="round"/>
+      <g fill="#cfc4ff" stroke="#2a1a52" stroke-width="1"><circle cx="78" cy="24" r="3"/><circle cx="175" cy="24" r="3"/><circle cx="298" cy="24" r="3"/></g>
+      <g transform="translate(232 15) scale(1.45) translate(-232 -15)">
+      <!-- arm and sleeve, reaching far off the screen -->
+      <g transform="translate(246 12) rotate(-17.8)">
+        <rect x="0" y="-13" width="42" height="26" rx="8" fill="url(#hd)" stroke="#8a4be8" stroke-width="1.2"/>
+        <path d="M52 -20L1300 -50V50L52 20Z" fill="url(#slv)" stroke="#6a3fc0" stroke-width="1.3" stroke-linejoin="round"/>
+        <rect x="36" y="-21" width="18" height="42" rx="5" fill="#2f2468" stroke="#8a4be8" stroke-width="1.2"/>
+        <path d="M45 -17V17" stroke="rgba(255,255,255,.28)" stroke-width="1.5" stroke-linecap="round"/>
+      </g>
+      <!-- fist gripping the bar -->
+      <rect x="203" y="-5" width="54" height="31" rx="13" fill="url(#hd)" stroke="#8a4be8" stroke-width="1.3"/>
+      <path d="M212 -1H248" stroke="rgba(255,255,255,.22)" stroke-width="2" stroke-linecap="round"/>
+      <g fill="url(#hd)" stroke="#8a4be8" stroke-width="1.2">
+        <rect x="244" y="7" width="12" height="22" rx="6"/>
+        <rect x="232.5" y="7" width="12" height="26" rx="6"/>
+        <rect x="221" y="7" width="12" height="27" rx="6"/>
+        <rect x="209.5" y="7" width="12" height="25" rx="6"/>
+        <rect x="198" y="1" width="13" height="23" rx="6.5" transform="rotate(-22 204 12)"/>
+      </g>
+      <path d="M246 19H254M234.5 20H242.5M223 21H231M211.5 20H219.5" stroke="rgba(138,75,232,.6)" stroke-width="1" stroke-linecap="round"/>
+      </g>
+    </svg>
+    <div class="swing">
+    <!-- three strings from the bar to the card; they swing together with the card -->
+    <svg class="cords" viewBox="0 0 350 110" aria-hidden="true">
+      <g stroke="rgba(255,255,255,.4)" stroke-width="1.2" fill="none"><path d="M78 24L24 110M175 24V110M298 24L326 110"/></g>
+      <g fill="#cfc4ff"><circle cx="24" cy="110" r="2.4"/><circle cx="175" cy="110" r="2.4"/><circle cx="326" cy="110" r="2.4"/></g>
+    </svg>
+    <div class="card">
+      <h1><span class="x">X</span><span class="o">O</span></h1>
+      <div class="say"><span id="sub">I have been warming up. Have you?</span></div>
+      <div class="tabs" role="tablist">
+        <button id="tIn" class="on" role="tab" type="button">Sign in</button>
+        <button id="tNew" role="tab" type="button">New account</button>
+      </div>
+      <input id="u" placeholder="Username" autocomplete="username" maxlength="14" autocapitalize="off" spellcheck="false">
+      <input id="p" type="password" placeholder="Password" autocomplete="current-password" maxlength="64">
+      <input id="p2" type="password" placeholder="Repeat password" autocomplete="new-password" maxlength="64" style="display:none">
+      <div class="err" id="err" role="alert"></div>
+      <button class="btn go" id="go" type="button">Sign in</button>
+      <div class="or">or</div>
+      <button class="btn guest" id="guest" type="button">Play as guest</button>
+    </div>
+    </div>
+  </div>
+</div>
+<script>
+/* XO accounts: login, cloud save, profile bar. One file, shared by every page. */
+(function () {
+  var CFG = { apiKey:"AIzaSyCtDlSEnVV26SryyLZmzBlWxu0uA4IPiUE", authDomain:"omarfarid-1af0c.firebaseapp.com",
+    databaseURL:"https://omarfarid-1af0c-default-rtdb.firebaseio.com", projectId:"omarfarid-1af0c",
+    storageBucket:"omarfarid-1af0c.firebasestorage.app", messagingSenderId:"1026936277627",
+    appId:"1:1026936277627:web:30e2ed7b571cf96952b0de" };
+  var DIVS = [{id:10,name:"Iron",color:"#888888"},{id:9,name:"Bronze",color:"#cd7f32"},{id:8,name:"Silver",color:"#cccccc"},{id:7,name:"Gold",color:"#ffcc00"},{id:6,name:"Platinum",color:"#00ccff"},{id:5,name:"Emerald",color:"#00ff99"},{id:4,name:"Diamond",color:"#00f3ff"},{id:3,name:"Elite",color:"#bc13fe"},{id:2,name:"Master",color:"#ff8800"},{id:1,name:"Legend",color:"#ff2244"}];
+  var AVATARS = ["❌","⭕","🔥","👑","⚡","🐉","🦅","🚀","💀","🎯","🌙","🧠"];
+  var SAVE_KEYS = ["xo_league_v2","xo_player","xo_lastrank"];
+  var LS = window.localStorage, auth, db, user = null, ready, pushT, readyCbs = [];
+  function g(k){ try { return LS.getItem(k); } catch(e){ return null; } }
+  function s(k,v){ window.__xoPulling = true; try { LS.setItem(k,v); } catch(e){} window.__xoPulling = false; }
+  function d(k){ try { LS.removeItem(k); } catch(e){} }
+  function esc(t){ return String(t).replace(/[<>&"]/g,""); }
+  function email(u){ return u.toLowerCase() + "@xo.game"; }
+
+  // ---- load Firebase modules (reuse whatever version the page already has) ----
+  function load(src){ return new Promise(function(ok,no){ var e=document.createElement("script"); e.src=src; e.onload=ok; e.onerror=no; document.head.appendChild(e); }); }
+  function boot(){
+    var v = (window.firebase && firebase.SDK_VERSION) || "10.7.1", b = "https://www.gstatic.com/firebasejs/"+v+"/firebase-", p = Promise.resolve();
+    if (!window.firebase) p = p.then(function(){ return load(b+"app-compat.js"); });
+    p = p.then(function(){ return firebase.auth ? 0 : load(b+"auth-compat.js"); })
+         .then(function(){ return firebase.database ? 0 : load(b+"database-compat.js"); });
+    return p.then(function(){
+      var app = firebase.apps.filter(function(a){ return a.name==="xoAuth"; })[0] || firebase.initializeApp(CFG,"xoAuth");
+      auth = app.auth(); db = app.database();
+      return new Promise(function(res){ var off = auth.onAuthStateChanged(function(u){ off(); user = u; res(u); }); });
+    });
+  }
+
+  // ---- cloud save ----
+  function snapshotLocal(){
+    var o = {}; SAVE_KEYS.forEach(function(k){ var v = g(k); if (v !== null) o[k] = v; }); o.t = Date.now(); return o;
+  }
+  function push(){
+    if (!user) return Promise.resolve();
+    var o = snapshotLocal(), ups = { "save": o };
+    try { var p = JSON.parse(o.xo_player||"null"); if (p && p.named && p.name) ups["profile/name"] = esc(p.name).slice(0,14); } catch(e){}
+    return db.ref("users/"+user.uid).update(ups).then(function(){ d("xo_dirty"); }).catch(function(){});
+  }
+  function pull(){
+    if (!user) return Promise.resolve();
+    if (g("xo_dirty")) return push();          // unsynced local progress wins, then uploads
+    return db.ref("users/"+user.uid).once("value").then(function(sn){
+      var v = sn.val() || {}, pr = v.profile || {}, sv = v.save || {};
+      SAVE_KEYS.forEach(function(k){ if (sv[k] != null) s(k, sv[k]); else if (k !== "xo_player") d(k); });
+      s("xo_player", JSON.stringify({ id: user.uid, name: pr.name || "Player", named: true }));
+      s("xo_profile", JSON.stringify(pr)); s("xo_hint", user.uid);
+    });
+  }
+  // any write to the game's save keys is queued for upload
+  var _set = Storage.prototype.setItem;
+  Storage.prototype.setItem = function(k,v){
+    _set.call(this,k,v);
+    if (this === LS && user && SAVE_KEYS.indexOf(k) > -1 && !window.__xoPulling) { _set.call(LS,"xo_dirty","1"); clearTimeout(pushT); pushT = setTimeout(push,1500); }
+  };
+  window.addEventListener("pagehide", function(){ if (user && g("xo_dirty")) push(); });
+
+  // ---- account actions ----
+  function reserveTag(n){
+    var t = String(10000 + Math.floor(Math.random()*90000));
+    return db.ref("tags/"+t).transaction(function(c){ return c ? undefined : user.uid; }).then(function(r){
+      return r.committed ? t : (n > 8 ? Promise.reject(new Error("tag")) : reserveTag((n||0)+1));
+    });
+  }
+  function cleanUser(u){
+    u = (u||"").trim();
+    if (!/^[A-Za-z0-9_]{3,14}$/.test(u)) throw { msg:"Username: 3 to 14 letters, numbers or _" };
+    return u;
+  }
+  function nice(e){
+    var m = { "auth/email-already-in-use":"That username is taken. Try another.", "auth/wrong-password":"Wrong password.",
+      "auth/invalid-credential":"Wrong username or password.", "auth/user-not-found":"No account with that username.",
+      "auth/weak-password":"Password needs at least 6 characters.", "auth/network-request-failed":"No connection. Check your internet.",
+      "auth/too-many-requests":"Too many tries. Wait a minute and retry.", "auth/operation-not-allowed":"Sign-in isn't enabled yet in Firebase (Email/Password)." };
+    m["PERMISSION_DENIED"] = "Database rules blocked this. In Firebase open Realtime Database > Rules and allow the users and tags paths.";
+    m["auth/configuration-not-found"] = "Authentication is not set up in Firebase yet (Build > Authentication > Get started).";
+    m["auth/invalid-api-key"] = "The Firebase API key is not valid.";
+    var code = e && (e.code || e.message || e);
+    return (e && e.msg) || m[e && e.code] || ("Something went wrong (" + code + ")");
+  }
+  var API = {
+    ready: function(fn){ ready.then(fn); },
+    user: function(){ return user; },
+    signUp: function(name, pass){
+      return ready.then(function(){
+        var u; try { u = cleanUser(name); } catch(e){ return Promise.reject(e); }
+        if (!auth) return Promise.reject({ msg:"Could not load Firebase. Check your internet or open the game in Chrome." });
+        if ((pass||"").length < 6) return Promise.reject({ code:"auth/weak-password" });
+        return auth.createUserWithEmailAndPassword(email(u), pass);
+      }).then(function(c){
+        user = c.user;
+        return reserveTag(0).then(function(tag){
+          var local = null; try { local = JSON.parse(g("xo_player")||"null"); } catch(e){}
+          var disp = (local && local.named && local.name) ? local.name : name.trim();
+          return db.ref("users/"+user.uid+"/profile").set({ name: esc(disp).slice(0,14), tag: tag, avatar: "", created: Date.now(), u: name.trim().toLowerCase() });
+        });
+      }).then(function(){
+        s("xo_dirty","1");                      // keep guest progress and upload it to the new account
+        var p; try { p = JSON.parse(g("xo_player")||"null"); } catch(e){}
+        return db.ref("users/"+user.uid+"/profile").once("value").then(function(sn){
+          s("xo_player", JSON.stringify({ id:user.uid, name:sn.val().name, named:true })); s("xo_profile", JSON.stringify(sn.val()));
+          d("xo_guest"); s("xo_hint", user.uid); return push();
+        });
+      }).catch(function(e){ throw nice(e); });
+    },
+    signIn: function(name, pass){
+      return ready.then(function(){
+        if (!auth) return Promise.reject({ msg:"Could not load Firebase. Check your internet or open the game in Chrome." });
+        return auth.signInWithEmailAndPassword(email((name||"").trim()), pass); })
+        .then(function(c){ user = c.user; d("xo_dirty"); d("xo_guest"); return pull(); })
+        .catch(function(e){ throw nice(e); });
+    },
+    guest: function(){ s("xo_guest","1"); s("xo_hint","guest"); },
+    signOut: function(){
+      return (user ? auth.signOut() : Promise.resolve()).then(function(){
+        SAVE_KEYS.concat(["xo_profile","xo_dirty","xo_guest","xo_hint"]).forEach(d); user = null; location.href = "Login.html";
+      });
+    },
+    setProfile: function(p){
+      var cur = {}; try { cur = JSON.parse(g("xo_profile")||"{}"); } catch(e){}
+      Object.keys(p).forEach(function(k){ cur[k] = p[k]; }); s("xo_profile", JSON.stringify(cur));
+      if (p.name){ var pl = {}; try { pl = JSON.parse(g("xo_player")||"{}"); } catch(e){} pl.name = p.name; pl.named = true; s("xo_player", JSON.stringify(pl)); }
+      return user ? db.ref("users/"+user.uid+"/profile").update(p) : Promise.resolve();
+    },
+    // gate: send people without an account or guest choice to the login page
+    init: function(o){
+      o = o || {};
+      if (o.require && !g("xo_hint")) { location.replace("Login.html"); return; }
+      if (o.require) document.documentElement.classList.add("xo-wait");
+      ready = boot().catch(function(){ return null; });
+      ready.then(function(u){
+        if (o.require && !u && g("xo_hint") !== "guest" && g("xo_hint")) { d("xo_hint"); location.replace("Login.html"); return; }
+        return (o.pull && u ? pull() : 0);
+      }).then(function(){ document.documentElement.classList.remove("xo-wait"); if (o.bar) mountBar(); });
+    }
+  };
+  window.XOAuth = API;
+  if (!ready) ready = Promise.resolve(null);
+
+  // ---- profile bar ----
+  function divInfo(){
+    var st = {}; try { st = JSON.parse(g("xo_league_v2")||"{}"); } catch(e){}
+    var dv = DIVS.filter(function(x){ return x.id === st.divId; })[0];
+    return { st: st, name: dv ? dv.name : "Iron", color: dv ? dv.color : "#888" };
+  }
+  function mountBar(){
+    var pr = {}; try { pr = JSON.parse(g("xo_profile")||"{}"); } catch(e){}
+    var guest = !user, name = guest ? "Guest" : (pr.name || "Player"), tag = guest ? "" : "#"+(pr.tag||"-----"), dv = divInfo();
+    var css = document.createElement("style");
+    css.textContent = ".xo-wait body{visibility:hidden}"+
+    "#xoBar{position:fixed;top:14px;right:14px;z-index:900;font-family:'Segoe UI',sans-serif;color:#fff}"+
+    "#xoChip{display:flex;align-items:center;gap:10px;padding:5px 16px 5px 5px;border:2px solid #9d00ff;border-radius:50px;background:rgba(5,6,16,.75);backdrop-filter:blur(6px);cursor:pointer;box-shadow:0 0 16px rgba(157,0,255,.35);transition:.25s}"+
+    "#xoChip:hover,#xoChip:focus-visible{box-shadow:0 0 26px #9d00ff;outline:none}"+
+    ".xo-av{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:20px;font-weight:900;background:linear-gradient(135deg,#9d00ff,#00f3ff);color:#fff;flex:none}"+
+    ".xo-nm{font-weight:800;font-size:14px;line-height:1.1;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}"+
+    ".xo-sub{font-size:11px;opacity:.7;letter-spacing:.5px}"+
+    "#xoPanel{display:none;position:absolute;right:0;top:56px;width:270px;padding:16px;border:2px solid #9d00ff;border-radius:22px;background:rgba(8,6,20,.96);box-shadow:0 0 30px rgba(157,0,255,.4)}"+
+    "#xoPanel.open{display:block}#xoPanel h4{margin:14px 0 6px;font-size:11px;letter-spacing:2px;opacity:.55;font-weight:700}"+
+    ".xo-in{width:100%;box-sizing:border-box;padding:9px 14px;border-radius:50px;border:2px solid rgba(255,255,255,.2);background:transparent;color:#fff;font-size:14px;outline:none}.xo-in:focus{border-color:#00f3ff}"+
+    ".xo-av-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}.xo-av-grid button{aspect-ratio:1;border-radius:50%;border:2px solid transparent;background:rgba(255,255,255,.06);font-size:17px;cursor:pointer}.xo-av-grid button.on{border-color:#00f3ff}"+
+    ".xo-stats{display:flex;justify-content:space-between;text-align:center}.xo-stats b{display:block;font-size:18px}.xo-stats span{font-size:10px;opacity:.6}"+
+    ".xo-btn{width:100%;margin-top:8px;padding:9px;border-radius:50px;border:2px solid #9d00ff;background:transparent;color:#fff;font-weight:700;font-size:13px;cursor:pointer;transition:.2s}.xo-btn:hover{background:#9d00ff}.xo-btn.out{border-color:#ff0055}.xo-btn.out:hover{background:#ff0055}"+
+    ".xo-msg{font-size:12px;min-height:14px;margin-top:4px;color:#00f3ff}"+
+    "@media(max-width:420px){.xo-nm{max-width:80px}}@media(prefers-reduced-motion:reduce){*{transition:none!important}}";
+    document.head.appendChild(css);
+    var el = document.createElement("div"); el.id = "xoBar";
+    var avatar = pr.avatar || (guest ? "👤" : name.charAt(0).toUpperCase());
+    el.innerHTML = '<div id="xoChip" tabindex="0" role="button" aria-label="Open profile"><div class="xo-av" id="xoAv">'+avatar+'</div><div><div class="xo-nm" id="xoNm">'+esc(name)+'</div><div class="xo-sub"><span id="xoTag">'+(guest?"Progress not saved":tag)+'</span>'+(guest?"":' · <span style="color:'+dv.color+'">'+dv.name+'</span>')+'</div></div></div>'+
+    '<div id="xoPanel">'+(guest ?
+      '<div style="font-size:13px;opacity:.85;line-height:1.5">You are playing as a guest. Create an account to keep your league progress on any device.</div><button class="xo-btn" id="xoCreate">Create account</button><button class="xo-btn out" id="xoSignOut">Sign in instead</button>' :
+      '<div class="xo-stats"><div><b>'+(dv.st.wins||0)+'</b><span>WINS</span></div><div><b>'+(dv.st.draws||0)+'</b><span>DRAWS</span></div><div><b>'+(dv.st.losses||0)+'</b><span>LOSSES</span></div><div><b>'+(dv.st.pts||0)+'</b><span>POINTS</span></div></div>'+
+      '<h4>DISPLAY NAME</h4><input class="xo-in" id="xoName" maxlength="14" value="'+esc(name)+'"><h4>AVATAR</h4><div class="xo-av-grid" id="xoAvs">'+AVATARS.map(function(a){return '<button data-a="'+a+'" class="'+(a===pr.avatar?"on":"")+'">'+a+'</button>';}).join("")+'</div>'+
+      '<div class="xo-msg" id="xoMsg"></div><button class="xo-btn" id="xoSave">Save changes</button><button class="xo-btn" id="xoCopy">Copy my ID '+tag+'</button><button class="xo-btn out" id="xoSignOut">Sign out</button>')+'</div>';
+    document.body.appendChild(el);
+    var panel = el.querySelector("#xoPanel"), chip = el.querySelector("#xoChip");
+    function tog(){ panel.classList.toggle("open"); }
+    chip.onclick = tog; chip.onkeydown = function(e){ if (e.key==="Enter"||e.key===" "){ e.preventDefault(); tog(); } };
+    document.addEventListener("click", function(e){ if (!el.contains(e.target)) panel.classList.remove("open"); });
+    el.querySelector("#xoSignOut").onclick = function(){ API.signOut(); };
+    if (guest) { el.querySelector("#xoCreate").onclick = function(){ location.href = "Login.html?mode=new"; }; return; }
+    var pick = pr.avatar || "", msg = el.querySelector("#xoMsg");
+    el.querySelector("#xoAvs").onclick = function(e){ var b = e.target.closest("button"); if (!b) return; pick = (pick === b.dataset.a) ? "" : b.dataset.a;
+      [].forEach.call(this.children, function(x){ x.classList.toggle("on", x.dataset.a === pick); }); };
+    el.querySelector("#xoSave").onclick = function(){
+      var n = esc(el.querySelector("#xoName").value).trim().slice(0,14);
+      if (n.length < 2) { msg.textContent = "Name needs at least 2 characters."; return; }
+      API.setProfile({ name:n, avatar:pick }).then(function(){
+        el.querySelector("#xoNm").textContent = n; el.querySelector("#xoAv").textContent = pick || n.charAt(0).toUpperCase(); msg.textContent = "Saved.";
+      }).catch(function(){ msg.textContent = "Couldn't save. Check your connection."; });
+    };
+    el.querySelector("#xoCopy").onclick = function(){
+      var t = tag; (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function(){ msg.textContent = "ID copied."; }).catch(function(){ msg.textContent = "Your ID is "+t; });
+    };
+  }
+})();
+
+</script>
+<script>
+var $ = function(i){ return document.getElementById(i); }, isNew = false;
+var SIGNIN = [
+  'Back again? I kept your seat warm. And your losses.',
+  'Welcome back. I studied your last game. You are in trouble.',
+  'Log in so I can beat you in person.',
+  'Forgot your password? I did not forget your moves.',
+  'Your league rank is lonely without you. So am I.',
+  'I have been warming up. Have you?',
+  'Your account is here. So is my winning streak.',
+  'Back for revenge? I respect that. It will not work.',
+  'Enter your password. I promise not to peek at your strategy.',
+  'Still thinking about our last game? I am.',
+  'You again? Good. I was getting bored winning alone.',
+  'Log in. Your rematch has been waiting all night.',
+  'I remember your favorite opening. It does not work.',
+  'Careful, your rank is watching. So am I.',
+  'Back so soon? I have not even finished celebrating.',
+  'Sign in and let us settle this once and for all.',
+  'Your seat is ready. Your excuses are too.',
+  'I trained all night. Do not say I did not warn you.',
+  'Welcome back, champion. Kidding. Log in and prove it.',
+  'I kept the board warm for you.'
+], NEWACC = 'Create an account so I can remember every time you lose.', line;
+/* a different line each visit, never the same one twice in a row */
+(function(){
+  var last = -1, i; try { last = parseInt(localStorage.getItem('xo_line')); } catch(e) {}
+  do { i = Math.floor(Math.random() * SIGNIN.length); } while (i === last);
+  try { localStorage.setItem('xo_line', i); } catch(e) {}
+  line = SIGNIN[i]; $('sub').textContent = line;
+})();
+function auth(){ if (!window.XOAuth) { $('err').textContent = 'Could not load auth.js. Make sure it is in the same folder.'; return null; } return window.XOAuth; }
+if (window.XOAuth) XOAuth.init({});
+function mode(n){
+  isNew = n; $('tIn').classList.toggle('on', !n); $('tNew').classList.toggle('on', n);
+  $('p2').style.display = n ? 'block' : 'none'; $('go').textContent = n ? 'Create account' : 'Sign in';
+  $('p').autocomplete = n ? 'new-password' : 'current-password'; $('err').textContent = '';
+  $('sub').textContent = n ? NEWACC : line;
+}
+$('tIn').onclick = function(){ mode(false); }; $('tNew').onclick = function(){ mode(true); };
+if (/mode=new/.test(location.search)) mode(true);
+function submit(){
+  var A = auth(); if (!A) return;
+  var u = $('u').value, p = $('p').value;
+  if (!u.trim() || !p) { $('err').textContent = 'Enter your username and password.'; return; }
+  if (isNew && p !== $('p2').value) { $('err').textContent = 'The two passwords do not match.'; return; }
+  $('go').disabled = true; $('err').textContent = '';
+  (isNew ? A.signUp(u, p) : A.signIn(u, p))
+    .then(function(){ location.href = 'Bbb.html'; })
+    .catch(function(m){ $('err').textContent = (typeof m === 'string') ? m : 'Something went wrong. Try again.'; $('go').disabled = false; });
+}
+$('go').onclick = submit;
+['u','p','p2'].forEach(function(i){ $(i).addEventListener('keydown', function(e){ if (e.key === 'Enter') submit(); }); });
+$('guest').onclick = function(){ var A = auth(); if (!A) return; A.guest(); location.href = 'Bbb.html'; };
+/* the card ignores clicks while it is still swinging in */
+setTimeout(function(){ document.querySelector('.hang').classList.remove('intro'); }, 2700);
+</script>
+</body>
+</html>
